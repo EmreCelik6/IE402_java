@@ -4,3 +4,7 @@
 /.idea/modules.xml
 /.idea/misc.xml
 /.idea/codeStyles/codeStyleConfig.xml
+/out/
+/analiz.csv
+/data_son.csv
+/.idea/libraries/

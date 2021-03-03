@@ -109,3 +109,4 @@ fabric.properties
 .*class
 
 # End of https://www.toptal.com/developers/gitignore/api/intellij
+/csv-plugin.xml

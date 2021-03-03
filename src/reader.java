@@ -92,7 +92,7 @@ public class reader {
                 while ((line = bri.readLine()) != null) {
                     String[] token = line.split(";");
                     String vibstr = token[1];
-                    if (Integer.parseInt(token[0]) <= 43472){
+                    //if (Integer.parseInt(token[0]) <= 43472){
                         if (S.contains(vibstr)) {
                             String str = token[0];
                             in.get((Integer.parseInt(str) - 43466)).add(new Inbound(V.get(S.indexOf(vibstr)), Integer.parseInt(token[2]), Integer.parseInt(str) - 43466));
@@ -111,7 +111,7 @@ public class reader {
                             }
                         }
                 }
-                }
+                //}
             } catch (FileNotFoundException e) {
                 e.printStackTrace();
             } catch (IOException e) {
@@ -146,12 +146,12 @@ public class reader {
                 String line = bro.readLine();
                 while ((line = bro.readLine()) != null) {
                     String[] token = line.split(";");
-                    if(Integer.parseInt(token[0])<=43472){
+                    //if(Integer.parseInt(token[0])<=43472){
                     if (S.contains(token[1])) {
                         String str = token[0];
                         out.get((Integer.parseInt(str) - 43466)).add(new Outbound(V.get(S.indexOf(token[1])), Integer.parseInt(token[2]), Integer.parseInt(str) - 43466));
                     }
-                }}
+                }//}
             } catch (FileNotFoundException e) {
                 e.printStackTrace();
             } catch (IOException e) {
@@ -237,10 +237,10 @@ public class reader {
             while ((line = br.readLine()) != null) {
                 String[] token = line.split(";");
                 if (Integer.parseInt(token[5]) < 0) {
-                    //if (Math.abs(Integer.parseInt(token[5])) >= Integer.parseInt(token[6])) {
+                    if (Math.abs(Integer.parseInt(token[5])) >= Integer.parseInt(token[6])) {
                     VIB_numbers.remove(VIB_numbers_S.indexOf(token[0]));
                     VIB_numbers_S.remove(token[0]);
-                    //}
+                    }
                 }
 
                 if (Integer.parseInt(token[1]) == 0 && Integer.parseInt(token[3]) == 0) {

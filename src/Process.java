@@ -5,7 +5,7 @@ import java.util.ArrayList;
 public class Process {
     public int[][] inbound_data;
     public int[][] outbound_data;
-    int dates = 7;
+    int dates = 365;
     public int[][] places;
 
     Process(ArrayList<ArrayList<Inbound>> in, ArrayList<ArrayList<Outbound>> out, ArrayList<VIB> vibs) throws IOException {

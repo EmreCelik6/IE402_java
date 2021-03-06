@@ -3,11 +3,13 @@ import java.util.ArrayList;
 
 public class reader {
     public static final double handling_doc_costs[] = {2.121, 0.512, 0.512, 1.916, 8.354, 0.497, 7.454, 1.916, 2.39, 0.223};
+    public static final int[] sorters = {0, 1, 2, 3, 4};
     public ArrayList<VIB> VIB_numbers = new ArrayList<VIB>();
     public ArrayList<String> VIB_numbers_S = new ArrayList<String>();
     public ArrayList<String> Handlingdocs = new ArrayList<String>();
     public ArrayList<ArrayList<Inbound>> inbounds = new ArrayList<>();
     public ArrayList<ArrayList<Outbound>> outbounds = new ArrayList<>();
+    public int unavailable_cap;
 
     reader(String inbound, String outbound, String handling, String stock) throws IOException {
         for (int i = 0; i < 365; i++) {
@@ -22,6 +24,7 @@ public class reader {
         read_inbound(inbound, VIB_numbers_S, VIB_numbers, inbounds, true);
         read_outbound(outbound, VIB_numbers_S, VIB_numbers, outbounds, true);
         read_handling(handling, VIB_numbers_S, VIB_numbers);
+        String output2 = write(VIB_numbers, "analiz2.csv");
     }
 
     private void read_stocks(String path, ArrayList<String> S, ArrayList<VIB> V, boolean state) {
@@ -67,7 +70,7 @@ public class reader {
                 String line = bri.readLine();
                 while ((line = bri.readLine()) != null) {
                     String[] token = line.split(";");
-                    String vibstr=token[1];
+                    String vibstr = token[1];
                     //if(Integer.parseInt(token[0])<=43472){
                     if (!S.contains(vibstr)) {
                         S.add((vibstr));
@@ -93,23 +96,25 @@ public class reader {
                     String[] token = line.split(";");
                     String vibstr = token[1];
                     //if (Integer.parseInt(token[0]) <= 43472){
-                        if (S.contains(vibstr)) {
-                            String str = token[0];
-                            in.get((Integer.parseInt(str) - 43466)).add(new Inbound(V.get(S.indexOf(vibstr)), Integer.parseInt(token[2]), Integer.parseInt(str) - 43466));
-                            if (token[4].contains("Cerkezk�y")) {
-                                V.get(S.indexOf(vibstr)).manufacturer = token[4];
-                                V.get(S.indexOf(vibstr)).place = 0;
-                            } else {
-                                V.get(S.indexOf(vibstr)).manufacturer = token[4];
-                                V.get(S.indexOf(vibstr)).place = 1;
-                            }
-                            String div = token[3];
-                            if (div.equals("PDC") || div.equals("PLC") || div.equals("PRF")) {
-                                V.get(S.indexOf(vibstr)).taşıma_cap = 12;
-                            } else {
-                                V.get(S.indexOf(vibstr)).taşıma_cap = 18;
-                            }
+                    if (S.contains(vibstr)) {
+                        String str = token[0];
+                        in.get((Integer.parseInt(str) - 43466)).add(new Inbound(V.get(S.indexOf(vibstr)), Integer.parseInt(token[2]), Integer.parseInt(str) - 43466));
+                        String div = token[3];
+                        if (token[4].contains("Cerkezk�y")) {
+                            V.get(S.indexOf(vibstr)).manufacturer = token[4];
+                            V.get(S.indexOf(vibstr)).place = 0;
+                            setSorters(V.get(S.indexOf(vibstr)), div, true);
+                        } else {
+                            V.get(S.indexOf(vibstr)).manufacturer = token[4];
+                            V.get(S.indexOf(vibstr)).place = 1;
+                            setSorters(V.get(S.indexOf(vibstr)), div, false);
                         }
+                        if (div.equals("PDC") || div.equals("PLC") || div.equals("PRF")) {
+                            V.get(S.indexOf(vibstr)).taşıma_cap = 12;
+                        } else {
+                            V.get(S.indexOf(vibstr)).taşıma_cap = 18;
+                        }
+                    }
                 }
                 //}
             } catch (FileNotFoundException e) {
@@ -177,7 +182,7 @@ public class reader {
                     int size = V.get(S.indexOf(token[1])).documents.size();
                     for (int i = 3; i < token.length; i++) {
                         if (token[i] != null) {
-                            V.get(S.indexOf(token[1])).documents.get(size-1).add(i);
+                            V.get(S.indexOf(token[1])).documents.get(size - 1).add(i);
                         }
                     }
                     V.get(S.indexOf(token[1])).pool_or_country = true;
@@ -204,6 +209,8 @@ public class reader {
         csvWriter.append("Inbound-Outbound\t");
         csvWriter.append(";");
         csvWriter.append("Stock\t");
+        csvWriter.append(";");
+        csvWriter.append("Pool/Country\t");
         csvWriter.append("\n");
 
         for (int i = 0; i < a.size(); i++) {
@@ -220,6 +227,12 @@ public class reader {
             csvWriter.append(Integer.toString((int) (this.VIB_numbers.get(i).total_inbound) - this.VIB_numbers.get(i).total_outbound));
             csvWriter.append(";");
             csvWriter.append(Integer.toString(this.VIB_numbers.get(i).initial_storage));
+            csvWriter.append(";");
+            if (this.VIB_numbers.get(i).pool_or_country) {
+                csvWriter.append("Pool");
+            } else {
+                csvWriter.append("Country");
+            }
             csvWriter.append("\n");
         }
         csvWriter.flush();
@@ -233,21 +246,22 @@ public class reader {
             br = new BufferedReader(new FileReader(a));
             String line = br.readLine();
             System.out.println("Total Vib numbers before elimination: " + VIB_numbers.size());
-            int unavailable_cap = 0;
+            int unavailable_cap2 = 0;
             while ((line = br.readLine()) != null) {
                 String[] token = line.split(";");
                 if (Integer.parseInt(token[5]) < 0) {
                     if (Math.abs(Integer.parseInt(token[5])) >= Integer.parseInt(token[6])) {
-                    VIB_numbers.remove(VIB_numbers_S.indexOf(token[0]));
-                    VIB_numbers_S.remove(token[0]);
+                        VIB_numbers.remove(VIB_numbers_S.indexOf(token[0]));
+                        VIB_numbers_S.remove(token[0]);
                     }
                 }
 
                 if (Integer.parseInt(token[1]) == 0 && Integer.parseInt(token[3]) == 0) {
                     VIB_numbers.remove(VIB_numbers_S.indexOf(token[0]));
                     VIB_numbers_S.remove(token[0]);
-                    unavailable_cap += Integer.parseInt(token[6]);
+                    unavailable_cap2 += Integer.parseInt(token[6]);
                 }
+                this.unavailable_cap = unavailable_cap2;
                 /*if(VIB_numbers_S.contains(token[0]) && Integer.parseInt(token[2])<4 && Integer.parseInt(token[4])<4){
                     VIB_numbers.remove(VIB_numbers_S.indexOf(token[0]));
                     VIB_numbers_S.remove(token[0]);
@@ -255,11 +269,37 @@ public class reader {
             }
             System.out.println("Total Vib numbers after elimination: " + VIB_numbers.size());
             System.out.println("Unavailable capacity= " + unavailable_cap);
-            write(VIB_numbers, "data_son.csv");
+            //write(VIB_numbers, "data_son.csv");
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
+        }
+    }
+
+    public void setSorters(VIB v, String div, boolean b) {
+        if (b) {
+            switch (div) {
+                case "PDC":
+                    v.sorter = 2;
+                    break;
+                case "PCG":
+                    v.sorter = 1;
+                    break;
+                case "PCP":
+                case "XX":
+                case "NC":
+                    v.sorter = 0;
+                    break;
+                case "PLC":
+                    v.sorter = 3;
+                    break;
+                case "PRF":
+                    v.sorter = 4;
+                    break;
+            }
+        } else {
+            v.sorter = 0;
         }
     }
 }

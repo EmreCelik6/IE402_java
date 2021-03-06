@@ -14,6 +14,7 @@ public class VIB {
     public ArrayList<String> countries=new ArrayList<String>();
     public boolean pool_or_country;
     public int taşıma_cap;
+    public int sorter;
     VIB(String vib_num){ vib_number=vib_num;this.initial_storage=0;this.pool_or_country=false; }
     public void add_initial_storage(int a){ this.initial_storage+=a; }
     public void add_inbound(int i){ total_inbound +=i;inbound_num++; }

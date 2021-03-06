@@ -7,9 +7,11 @@ public class Process {
     public int[][] outbound_data;
     int dates = 365;
     public int[][] places;
+    public Adres[][] adresler = new Adres[1][2];
 
     Process(ArrayList<ArrayList<Inbound>> in, ArrayList<ArrayList<Outbound>> out, ArrayList<VIB> vibs) throws IOException {
-        this.inbound_data = new int[dates][vibs.size()];
+        //DATA BASMAK İÇİN
+        /*this.inbound_data = new int[dates][vibs.size()];
         this.outbound_data = new int[dates][vibs.size()];
         this.places = new int[dates][vibs.size()];
         for (int k = 0; k < vibs.size(); k++) {
@@ -59,12 +61,21 @@ public class Process {
                 }
             }
             gün2+=günler.get(i);
-        }*/
+        }
 
-        /*writedatas(inbound_data,"inbound_data.csv");
+        writedatas(inbound_data,"inbound_data.csv");
         writedatas(outbound_data,"outbound_data.csv");
         writeplaces(vibs,"places.csv");*/
+
+        int inbound7=0;
+        for (int d=0;d<7;d++){
+            for (int i=0;i<in.get(d).size();i++){
+                inbound7+=in.get(d).get(i).order_qnt;
+            }
+        }
+        System.out.println("7 day total inbound: "+inbound7);
     }
+
     void writedatas(int[][] data,String path) throws IOException {
         FileWriter csvWriter = new FileWriter(path);
         for (int i=0;i<data.length;i++){

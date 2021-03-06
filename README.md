@@ -8,7 +8,9 @@ TO DO LIST **
  
  - Data cleansing 
 
- - Warehouse adresess implementation
+ - Warehouse adreses implementation
+
+ - VIB Gruplama??
  
  
  
